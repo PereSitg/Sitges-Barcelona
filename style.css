@@ -1,8 +1,9 @@
 :root {
     --burgundy: #800020;
     --white: #ffffff;
-    --text-dark: #1a1a1a;
-    --bg-light: #f9f9f9;
+    --text-dark: #333;
+    --bg-light: #f4f4f4;
+    --shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
 * {
@@ -12,12 +13,13 @@
 }
 
 body {
-    font-family: 'Inter', -apple-system, sans-serif;
+    font-family: 'Roboto', sans-serif;
     background-color: var(--white);
     color: var(--text-dark);
     line-height: 1.6;
 }
 
+/* Capçalera Bordeus Fixa */
 header {
     background-color: var(--burgundy);
     color: var(--white);
@@ -25,7 +27,7 @@ header {
     position: sticky;
     top: 0;
     z-index: 1000;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+    box-shadow: var(--shadow);
 }
 
 .header-content {
@@ -35,19 +37,22 @@ header {
     display: flex;
     justify-content: space-between;
     align-items: center;
+    flex-wrap: wrap;
+    /* Permet que s'ajusti en mòbils */
+    gap: 1rem;
 }
 
 header h1 {
     font-family: 'Playfair Display', serif;
     font-size: 2rem;
-    font-weight: 800;
-    letter-spacing: -0.5px;
+    letter-spacing: 1px;
 }
 
 nav ul {
     list-style: none;
     display: flex;
-    gap: 2rem;
+    gap: 1.5rem;
+    flex-wrap: wrap;
 }
 
 nav a {
@@ -55,99 +60,88 @@ nav a {
     text-decoration: none;
     font-weight: 500;
     text-transform: uppercase;
-    font-size: 0.9rem;
-    letter-spacing: 0.5px;
-    position: relative;
-    padding: 0.2rem 0;
+    font-size: 0.85rem;
 }
 
-nav a::after {
-    content: '';
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    width: 0;
-    height: 2px;
-    background-color: var(--white);
-    transition: width 0.3s;
+nav a:hover {
+    text-decoration: underline;
 }
 
-nav a:hover::after {
-    width: 100%;
-}
-
+/* Contingut Principal */
 .container {
     max-width: 1200px;
-    margin: 3rem auto;
-    padding: 0 1.5rem;
+    margin: 2rem auto;
+    padding: 0 1rem;
     display: grid;
     grid-template-columns: 1fr;
-    gap: 3rem;
+    gap: 2rem;
+}
+
+#feed {
+    width: 100%;
 }
 
 .sidebar {
     display: none;
 }
 
+/* Targetes de Notícia */
 .news-card {
-    background: #fff;
-    border-radius: 12px;
+    background: var(--white);
+    margin-bottom: 2.5rem;
+    border: 1px solid #ddd;
+    border-radius: 8px;
     overflow: hidden;
-    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.06);
-    border: 1px solid #eee;
-    transition: transform 0.3s;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
 }
 
-.news-card:hover {
-    transform: translateY(-5px);
+.news-card-title {
+    background-color: var(--burgundy);
+    color: var(--white);
+    padding: 1.2rem;
 }
 
 .news-card h2 {
-    background-color: var(--burgundy);
-    color: var(--white);
-    padding: 1.5rem;
     font-family: 'Playfair Display', serif;
-    font-size: 1.6rem;
+    font-size: 1.4rem;
+    margin: 0;
 }
 
 .news-content {
-    padding: 2rem;
+    padding: 1.5rem;
 }
 
-.ai-badge {
-    background: #f0fdf4;
-    color: #166534;
-    padding: 0.3rem 0.8rem;
-    border-radius: 6px;
-    font-weight: 700;
-    font-size: 0.8rem;
-    display: inline-block;
-    border: 1px solid #bbf7d0;
+.news-content p {
+    margin-bottom: 1.5rem;
+    color: #444;
+}
+
+.news-meta-box {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.85rem;
+    color: #777;
     margin-bottom: 1rem;
+    border-top: 1px solid #eee;
+    padding-top: 1rem;
 }
 
-.read-more-btn {
-    background: var(--burgundy);
-    color: #fff;
-    padding: 1rem;
+.read-more-link {
+    display: inline-block;
+    color: var(--burgundy);
     text-decoration: none;
-    border-radius: 8px;
-    font-weight: 700;
-    text-align: center;
+    font-weight: bold;
+    font-size: 0.95rem;
 }
 
-.translation-toggle {
-    background: #f1f1f1;
-    border: 1px solid #ddd;
-    padding: 0.6rem;
-    border-radius: 6px;
-    cursor: pointer;
-    font-size: 0.8rem;
+.read-more-link:hover {
+    text-decoration: underline;
 }
 
+/* Media Queries */
 @media (min-width: 1024px) {
     .container {
-        grid-template-columns: 280px 1fr 280px;
+        grid-template-columns: 200px 1fr 200px;
     }
 
     .sidebar {
@@ -155,10 +149,18 @@ nav a:hover::after {
     }
 }
 
-@media (max-width: 768px) {
+@media (max-width: 600px) {
     .header-content {
-        flex-direction: column;
-        gap: 1.5rem;
+        justify-content: center;
         text-align: center;
+    }
+
+    nav ul {
+        justify-content: center;
+    }
+
+    .news-meta-box {
+        flex-direction: column;
+        gap: 0.5rem;
     }
 }

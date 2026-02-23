@@ -1,98 +1,65 @@
-// Configuració
-const feedContainer = document.getElementById('feed');
-const loadingTrigger = document.getElementById('loading');
+document.addEventListener('DOMContentLoaded', () => {
+    const feedContainer = document.getElementById('feed');
+    const rssUrl = 'https://news.google.com/rss/search?q=Sitges&hl=ca&gl=ES&ceid=ES:ca';
+    // Utilitzem rss2json per convertir l'RSS a JSON de forma gratuïta al client
+    const apiUrl = `https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(rssUrl)}`;
 
-const CACHE_KEY = 'la_veu_noticies_v2';
-const CACHE_TIME = 4 * 60 * 60 * 1000; // 4 hores
+    async function fetchNews() {
+        try {
+            const response = await fetch(apiUrl);
+            if (!response.ok) throw new Error('Error al connectar amb el servei de notícies');
 
-const fetchNews = async () => {
-    loadingTrigger.style.display = 'block';
+            const data = await response.json();
 
-    // 1. Comprovar cache
-    const cachedData = localStorage.getItem(CACHE_KEY);
-    if (cachedData) {
-        const { timestamp, news } = JSON.parse(cachedData);
-        if (new Date().getTime() - timestamp < CACHE_TIME) {
-            renderNews(news);
-            loadingTrigger.style.display = 'none';
+            if (data.status !== 'ok') {
+                throw new Error('No es han pogut carregar les notícies del servidor');
+            }
+
+            renderNews(data.items);
+        } catch (error) {
+            console.error('Error:', error);
+            feedContainer.innerHTML = `
+                <div style="text-align:center; padding:2rem; border: 2px solid var(--burgundy); border-radius: 8px;">
+                    <h2 style="color: var(--burgundy);">⚠️ Problema amb la Veu</h2>
+                    <p style="margin-top: 1rem;">Ho sentim, no s'han pogut carregar les notícies en aquest moment.</p>
+                    <p style="font-size: 0.8rem; color: #666;">${error.message}</p>
+                </div>
+            `;
+        }
+    }
+
+    function renderNews(items) {
+        feedContainer.innerHTML = ''; // Netegem el contenidor
+
+        if (items.length === 0) {
+            feedContainer.innerHTML = '<p style="text-align:center;">No hi ha notícies recents de Sitges.</p>';
             return;
         }
+
+        items.forEach(item => {
+            const article = document.createElement('article');
+            article.className = 'news-card';
+
+            // Formatem la data
+            const dateParams = { day: 'numeric', month: 'long', year: 'numeric' };
+            const dateFormatted = new Date(item.pubDate).toLocaleDateString('ca-ES', dateParams);
+
+            article.innerHTML = `
+                <div class="news-card-title">
+                    <h2>${item.title}</h2>
+                </div>
+                <div class="news-content">
+                    <p>${item.description || 'Consulta els detalls complets d\'aquesta crònica a la font original.'}</p>
+                    <div class="news-meta-box">
+                        <span class="source">Font: <strong>${item.author || 'Google News'}</strong></span>
+                        <span class="date">Publicat: ${dateFormatted}</span>
+                    </div>
+                    <a href="${item.link}" target="_blank" class="read-more-link">Llegir notícia completa &rarr;</a>
+                </div>
+            `;
+            feedContainer.appendChild(article);
+        });
     }
 
-    try {
-        const response = await fetch('/api/news');
-        if (!response.ok) {
-            const errorText = await response.text();
-            throw new Error(`API Error: ${response.status} - ${errorText}`);
-        }
-        const news = await response.json();
-
-        localStorage.setItem(CACHE_KEY, JSON.stringify({
-            timestamp: new Date().getTime(),
-            news: news
-        }));
-
-        renderNews(news);
-    } catch (error) {
-        console.error('Error fetching news:', error);
-        feedContainer.innerHTML = `
-            <div style="text-align:center; padding:2rem;">
-                <p>No s'han pogut carregar les notícies reals.</p>
-                <p style="font-size: 0.8rem; color: #cc0000; margin-top: 1rem;">Detalls: ${error.message}</p>
-                <button onclick="localStorage.removeItem('${CACHE_KEY}'); location.reload();" style="margin-top: 1rem; border: none; background: var(--burgundy); color: white; padding: 0.5rem 1rem; border-radius: 4px; cursor: pointer;">Tornar a provar</button>
-            </div>
-        `;
-    } finally {
-        loadingTrigger.style.display = 'none';
-    }
-};
-
-const renderNews = (newsItems) => {
-    feedContainer.innerHTML = '';
-    newsItems.forEach(item => {
-        const card = createNewsCard(item);
-        feedContainer.appendChild(card);
-    });
-};
-
-const createNewsCard = (item) => {
-    const card = document.createElement('article');
-    card.className = 'news-card';
-    let isTranslated = true;
-
-    card.innerHTML = `
-        <div class="news-image" style="height: 220px; background: url('${item.image}') center/cover no-repeat; border-bottom: 4px solid var(--burgundy);"></div>
-        <h2 class="title-el">${item.title}</h2>
-        <div class="news-content">
-            <div class="ai-badge">✨ Traducció IA (Llama 3)</div>
-            <p>Font original: <strong>${item.source}</strong></p>
-            <div style="display: flex; flex-direction: column; gap: 1rem;">
-                <a href="${item.link}" target="_blank" class="read-more-btn">Llegir notícia completa &rarr;</a>
-                <button class="translation-toggle">Original: ${item.originalTitle.substring(0, 30)}...</button>
-            </div>
-            <span class="news-meta">Publicat el ${new Date(item.pubDate).toLocaleDateString('ca-ES')}</span>
-        </div>
-    `;
-
-    const titleEl = card.querySelector('.title-el');
-    const toggleBtn = card.querySelector('.translation-toggle');
-    const aiBadge = card.querySelector('.ai-badge');
-
-    toggleBtn.addEventListener('click', () => {
-        if (isTranslated) {
-            titleEl.textContent = item.originalTitle;
-            toggleBtn.textContent = 'Veure traducció al català';
-            aiBadge.style.opacity = '0.3';
-        } else {
-            titleEl.textContent = item.title;
-            toggleBtn.textContent = `Original: ${item.originalTitle.substring(0, 30)}...`;
-            aiBadge.style.opacity = '1';
-        }
-        isTranslated = !isTranslated;
-    });
-
-    return card;
-};
-
-fetchNews();
-setInterval(fetchNews, 10 * 60 * 1000); // Check cache every 10 mins
+    fetchNews();
+});
