@@ -8,7 +8,6 @@ window.onload = () => {
     const modalDescEs = document.getElementById('modal-desc-es');
     const modalLink = document.getElementById('modal-link');
 
-    // Detectem la secció segons l'atribut de la pàgina
     const currentSection = document.body.getAttribute('data-section') || 'general';
 
     const FEEDS_CONFIG = {
@@ -21,18 +20,18 @@ window.onload = () => {
             'https://www.ccgarraf.cat/rss/14/0/'
         ],
         festival: ['https://news.google.com/rss/search?q=festival%20cinema%20sitges&hl=es&gl=ES&ceid=ES%3Aes'],
-        restaurants: ['https://news.google.com/rss/search?q=donde+comer+en+sitges&hl=es&gl=ES&ceid=ES%3Aes']
+        restaurants: [] // No carreguem notícies a restaurants tal com s'ha demanat
     };
 
-    // Llista d'instàncies Nitter per seguretat (fallback)
     const NITTER_INSTANCES = [
         'https://nitter.net',
         'https://nitter.poast.org',
         'https://nitter.cz',
-        'https://nitter.privacydev.net'
+        'https://nitter.privacydev.net',
+        'https://nitter.perennialte.ch'
     ];
 
-    // Imatges de Sitges realment estables (Unsplash i Wikimedia directes)
+    // Imatges de Sitges d'alta qualitat i estables
     const SAFE_SITGES_IMAGES = [
         'https://images.unsplash.com/photo-1548175114-61c0bd664653?q=80&w=800&auto=format&fit=crop',
         'https://images.unsplash.com/photo-1582260600171-89771ba0df8b?q=80&w=800&auto=format&fit=crop',
@@ -60,19 +59,21 @@ window.onload = () => {
     function extractImage(item) {
         let url = '';
         if (item.enclosure && item.enclosure.link) url = item.enclosure.link;
+        else if (item.thumbnail) url = item.thumbnail;
         else {
             const match = item.description.match(/<img[^>]+src=["']([^"']+)["']/);
             if (match) url = match[1];
         }
-        // Evitem proxies que fallen, intentem weserv només si és segur
+
         if (url && !url.includes('google.com')) {
-            const cleanUrl = url.replace(/^https?:\/\//, '');
-            return `https://images.weserv.nl/?url=${cleanUrl}&w=800&fit=cover`;
+            // El proxy wsrv.nl és més modern i estable que weserv.nl
+            return `https://wsrv.nl/?url=${encodeURIComponent(url)}&w=800&fit=cover`;
         }
         return SAFE_SITGES_IMAGES[Math.floor(Math.random() * SAFE_SITGES_IMAGES.length)];
     }
 
     async function fetchNews(isInitial = false) {
+        if (currentSection === 'restaurants') return; // Neteja total de notícies a restaurants
         if (isFetchingNews) return;
         isFetchingNews = true;
 
@@ -165,7 +166,7 @@ window.onload = () => {
         const instance = NITTER_INSTANCES[instanceIdx];
         const rssUrl = `${instance}/search/rss?f=tweets&q=%23sitges`;
 
-        // Utilitzem rss2json per saltar CORS tal com demana l'expert
+        // Exactament com ha demanat l'expert per saltar CORS
         const apiUrl = `https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(rssUrl)}`;
 
         try {
@@ -182,6 +183,7 @@ window.onload = () => {
     }
 
     function renderX(items) {
+        if (!twitterFeed) return;
         twitterFeed.innerHTML = '';
         items.slice(0, 10).forEach(item => {
             const card = document.createElement('div');
@@ -208,9 +210,7 @@ window.onload = () => {
     const obs = new IntersectionObserver((es) => { if (es[0].isIntersecting) fetchNews(); }, { threshold: 0.1 });
     obs.observe(sentinel);
 
-    if (currentSection !== 'restaurants') {
-        fetchNews(true);
-    }
+    fetchNews(true);
     fetchX();
-    setInterval(() => { fetchNews(true); fetchX(); }, 4 * 60 * 60 * 1000);
+    setInterval(() => { if (currentSection !== 'restaurants') fetchNews(true); fetchX(); }, 4 * 60 * 60 * 1000);
 };
