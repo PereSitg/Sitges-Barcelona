@@ -134,6 +134,7 @@ window.onload = () => {
         linkGeneral.classList.toggle('active', section === 'general');
         linkFestival.classList.toggle('active', section === 'festival');
 
+        window.scrollTo(0, 0); // Efecte de "pàgina nova"
         fetchNews();
     }
 
@@ -143,10 +144,17 @@ window.onload = () => {
     modalClose.onclick = () => iaModal.style.display = 'none';
     window.onclick = (e) => { if (e.target == iaModal) iaModal.style.display = 'none'; };
 
+    // Scroll Infinit
     const observer = new IntersectionObserver((entries) => {
         if (entries[0].isIntersecting && !isFetching) fetchNews();
     }, { threshold: 0.1 });
     observer.observe(sentinel);
+
+    // Auto-actualització cada 4 hores (14.400.000 ms)
+    setInterval(() => {
+        console.log("Actualització automàtica de 4 hores...");
+        switchSection(currentSection); // Refresca la secció actual completament
+    }, 4 * 60 * 60 * 1000);
 
     // Initial load
     fetchNews();
