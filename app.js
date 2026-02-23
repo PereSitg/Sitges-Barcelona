@@ -27,13 +27,20 @@ window.onload = () => {
     let isFetching = false;
 
     async function translateTitle(title) {
+        const baseTitle = title.split(' - ')[0];
         try {
-            const baseTitle = title.split(' - ')[0];
             const res = await fetch(`https://api.mymemory.translated.net/get?q=${encodeURIComponent(baseTitle)}&langpair=es|ca`);
             const data = await res.json();
-            return data.responseData.translatedText || baseTitle;
+            const translatedText = data.responseData.translatedText;
+
+            // Detectar error de quota o resposta buida
+            if (!translatedText || translatedText.includes("MYMEMORY WARNING")) {
+                return { text: baseTitle, translated: false };
+            }
+
+            return { text: translatedText, translated: true };
         } catch (e) {
-            return title.split(' - ')[0];
+            return { text: baseTitle, translated: false };
         }
     }
 
@@ -86,7 +93,9 @@ window.onload = () => {
             card.className = `news-card ${theme === 'festival' ? 'festival' : ''}`;
 
             const imgUrl = extractImage(item, theme);
-            const titleCa = translatedTitles[index];
+            const titleObj = translatedTitles[index];
+            const titleCa = titleObj.text;
+            const translationBadge = titleObj.translated ? '' : '<span class="translation-badge">Pendent de traducció</span>';
 
             const tmp = document.createElement('div');
             tmp.innerHTML = item.description;
@@ -97,6 +106,7 @@ window.onload = () => {
 
             card.innerHTML = `
                 <div class="card-title">
+                    ${translationBadge}
                     <h2>${titleCa}</h2>
                 </div>
                 <div class="img-container">
