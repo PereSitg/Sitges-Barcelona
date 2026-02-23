@@ -7,24 +7,42 @@ window.onload = () => {
     const modalTitleEs = document.getElementById('modal-title-es');
     const modalDescEs = document.getElementById('modal-desc-es');
     const modalLink = document.getElementById('modal-link');
+    const pageTitle = document.getElementById('page-title');
 
     const brandLink = document.getElementById('brand-link');
     const linkGeneral = document.getElementById('link-general');
     const linkFestival = document.getElementById('link-festival');
+    const linkRestaurants = document.getElementById('id-restaurants');
 
     // Feeds Config
-    const RSS_NEWS = [
-        'https://news.google.com/rss/search?q=sitges&hl=es&gl=ES&ceid=ES%3Aes',
-        'https://www.ccgarraf.cat/rss/11/0/',
-        'https://www.ccgarraf.cat/rss/36/0/',
-        'https://www.ccgarraf.cat/rss/12/0/',
-        'https://www.ccgarraf.cat/rss/15/0/',
-        'https://www.ccgarraf.cat/rss/14/0/'
+    const FEEDS_CONFIG = {
+        general: [
+            'https://news.google.com/rss/search?q=sitges&hl=es&gl=ES&ceid=ES%3Aes',
+            'https://www.ccgarraf.cat/rss/11/0/',
+            'https://www.ccgarraf.cat/rss/36/0/',
+            'https://www.ccgarraf.cat/rss/12/0/',
+            'https://www.ccgarraf.cat/rss/15/0/',
+            'https://www.ccgarraf.cat/rss/14/0/'
+        ],
+        festival: ['https://news.google.com/rss/search?q=festival%20cinema%20sitges&hl=es&gl=ES&ceid=ES%3Aes'],
+        restaurants: ['https://news.google.com/rss/search?q=donde+comer+en+sitges&hl=es&gl=ES&ceid=ES%3Aes']
+    };
+
+    const SECTION_LABELS = {
+        general: 'Pàgina Inici',
+        festival: 'Sitges Film Festival',
+        restaurants: 'Donde comer en Sitges'
+    };
+
+    const NITTER_INSTANCES = [
+        'https://nitter.poast.org',
+        'https://nitter.cz',
+        'https://nitter.privacydev.net',
+        'https://nitter.perennialte.ch',
+        'https://nitter.moomoo.me'
     ];
 
-    const RSS_X = 'https://nitter.poast.org/search/rss?f=tweets&q=%23sitges';
-
-    // Safe Images List - Una llibreria més àmplia i específica de SITGES (i no genèrica)
+    // Safe Images List (Curated)
     const SAFE_SITGES_IMAGES = [
         'https://images.weserv.nl/?url=www.visitsitges.com/wp-content/uploads/2020/09/esglesia-sitges-barcelona.jpg&w=800&fit=cover',
         'https://images.weserv.nl/?url=www.visitsitges.com/wp-content/uploads/2021/04/platja-sant-sebastia-sitges.jpg&w=800&fit=crop',
@@ -32,12 +50,6 @@ window.onload = () => {
         'https://images.weserv.nl/?url=www.sitgesanytime.com/media/site/baluard-vidal-i-quadras.jpg&w=800&fit=crop',
         'https://images.weserv.nl/?url=www.sitgesanytime.com/media/site/rac-de-la-calma.jpg&w=800&fit=crop',
         'https://images.weserv.nl/?url=www.visitsitges.com/wp-content/uploads/2022/01/port-aiguadolç-sitges.jpg&w=800&fit=crop'
-    ];
-
-    const NITTER_INSTANCES = [
-        'https://nitter.poast.org',
-        'https://nitter.cz',
-        'https://nitter.privacydev.net'
     ];
 
     let currentSection = 'general';
@@ -79,9 +91,7 @@ window.onload = () => {
             itemsShown = 0;
             feed.innerHTML = '<div id="loading-msg">Carregant la Veu de Sitges...</div>';
 
-            const urls = currentSection === 'festival'
-                ? ['https://news.google.com/rss/search?q=festival%20cinema%20sitges&hl=es&gl=ES&ceid=ES%3Aes']
-                : RSS_NEWS;
+            const urls = FEEDS_CONFIG[currentSection] || FEEDS_CONFIG.general;
 
             const fetchPromises = urls.map(url => {
                 const apiUrl = `https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(url)}&t=${Date.now()}`;
@@ -156,19 +166,27 @@ window.onload = () => {
         });
     }
 
-    async function fetchX() {
+    async function fetchX(instanceIdx = 0) {
         if (!twitterFeed) return;
-        const apiUrl = `https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(RSS_X)}&t=${Date.now()}`;
+        if (instanceIdx >= NITTER_INSTANCES.length) {
+            twitterFeed.innerHTML = '<div style="padding:1rem; color:#888; text-align:center;">Xarxes no disponibles temporalment.</div>';
+            return;
+        }
+
+        const instance = NITTER_INSTANCES[instanceIdx];
+        const searchPath = '/search/rss?f=tweets&q=%23sitges';
+        const apiUrl = `https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(instance + searchPath)}&t=${Date.now()}`;
+
         try {
             const res = await fetch(apiUrl);
             const data = await res.json();
             if (data.status === 'ok' && data.items && data.items.length > 0) {
                 renderX(data.items);
             } else {
-                twitterFeed.innerHTML = '<div style="padding:1rem; color:#888;">Xarxes no disponibles temporalment.</div>';
+                fetchX(instanceIdx + 1);
             }
         } catch (e) {
-            twitterFeed.innerHTML = '<div style="padding:1rem; color:#888;">No s\'han pogut carregar les xarxes.</div>';
+            fetchX(instanceIdx + 1);
         }
     }
 
@@ -195,8 +213,18 @@ window.onload = () => {
 
     function switchSection(section) {
         currentSection = section;
+
+        // Update Nav
         linkGeneral.classList.toggle('active', section === 'general');
         linkFestival.classList.toggle('active', section === 'festival');
+        if (linkRestaurants) linkRestaurants.classList.toggle('active', section === 'restaurants');
+
+        // Update Page Label
+        if (pageTitle) {
+            pageTitle.innerText = SECTION_LABELS[section] || 'La Veu de Sitges';
+            pageTitle.style.display = 'block';
+        }
+
         window.scrollTo(0, 0);
         fetchNews(true);
     }
@@ -204,13 +232,15 @@ window.onload = () => {
     brandLink.onclick = () => switchSection('general');
     linkGeneral.onclick = (e) => { e.preventDefault(); switchSection('general'); };
     linkFestival.onclick = (e) => { e.preventDefault(); switchSection('festival'); };
+    if (linkRestaurants) linkRestaurants.onclick = (e) => { e.preventDefault(); switchSection('restaurants'); };
     modalClose.onclick = () => iaModal.style.display = 'none';
     window.onclick = (e) => { if (e.target == iaModal) iaModal.style.display = 'none'; };
 
     const obs = new IntersectionObserver((es) => { if (es[0].isIntersecting) fetchNews(); }, { threshold: 0.1 });
     obs.observe(sentinel);
 
-    fetchNews(true);
+    // Initial load
+    switchSection('general');
     fetchX();
     setInterval(() => { fetchNews(true); fetchX(); }, 4 * 60 * 60 * 1000);
 };
