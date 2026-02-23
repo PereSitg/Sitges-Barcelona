@@ -7,21 +7,35 @@ window.onload = () => {
     const modalDescEs = document.getElementById('modal-desc-es');
     const modalLink = document.getElementById('modal-link');
 
-    // Tornem al feed en Castellà per tenir totes les notícies
-    const rssUrl = 'https://news.google.com/rss/search?q=sitges&hl=es&gl=ES&ceid=ES%3Aes';
-    const apiUrl = `https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(rssUrl)}&t=${Date.now()}`;
+    const bannerTitle = document.getElementById('current-section-title');
+    const linkGeneral = document.getElementById('link-general');
+    const linkFestival = document.getElementById('link-festival');
 
+    // Feeds
+    const FEEDS = {
+        general: {
+            url: 'https://news.google.com/rss/search?q=sitges&hl=es&gl=ES&ceid=ES%3Aes',
+            title: 'Cròniques de Sitges',
+            theme: 'default'
+        },
+        festival: {
+            url: 'https://news.google.com/rss/search?q=festival%20cinema%20sitges&hl=es&gl=ES&ceid=ES%3Aes',
+            title: 'Sitges Film Festival',
+            theme: 'festival'
+        }
+    };
+
+    let currentSection = 'general';
     let isFetching = false;
 
     async function translateTitle(title) {
         try {
-            // Netegem el títol d'extensió de font "- La Vanguardia", etc
             const baseTitle = title.split(' - ')[0];
             const res = await fetch(`https://api.mymemory.translated.net/get?q=${encodeURIComponent(baseTitle)}&langpair=es|ca`);
             const data = await res.json();
             return data.responseData.translatedText || baseTitle;
         } catch (e) {
-            return title.split(' - ')[0]; // Fallback al títol net en castellà
+            return title.split(' - ')[0];
         }
     }
 
@@ -29,12 +43,15 @@ window.onload = () => {
         if (isFetching) return;
         isFetching = true;
 
+        const config = FEEDS[currentSection];
+        const apiUrl = `https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(config.url)}&t=${Date.now()}`;
+
         try {
             const res = await fetch(apiUrl);
             const data = await res.json();
-            if (data.status !== 'ok') throw new Error('API sanchat');
+            if (data.status !== 'ok') throw new Error('API Error');
 
-            renderNews(data.items);
+            renderNews(data.items, config.theme);
         } catch (e) {
             console.error(e);
         } finally {
@@ -42,7 +59,7 @@ window.onload = () => {
         }
     }
 
-    function extractImage(item) {
+    function extractImage(item, theme) {
         let url = '';
         if (item.enclosure && item.enclosure.link) {
             url = item.enclosure.link;
@@ -56,28 +73,29 @@ window.onload = () => {
             return `https://images.weserv.nl/?url=${cleanUrl}&w=800&fit=cover`;
         }
 
-        // --- REQUISIT: Si no hi ha imatge, en busquem una del tema ---
-        // Usem LoremFlickr amb el tag "sitges,spain" per garantir una foto d'acord amb el tema
-        return `https://loremflickr.com/800/400/sitges,spain?random=${Math.random()}`;
+        // Fallback per tema
+        const keyword = theme === 'festival' ? 'cinema,festival,red-carpet' : 'sitges,spain';
+        return `https://loremflickr.com/800/400/${keyword}?random=${Math.random()}`;
     }
 
-    async function renderNews(items) {
-        if (feed.querySelector('#loading-msg')) feed.innerHTML = '';
+    async function renderNews(items, theme) {
+        if (feed.innerHTML === '<div id="loading-msg">Carregant la Veu de Sitges...</div>') feed.innerHTML = '';
 
-        // Traduccions en paral·lel dels títols (només títols per no saturar l'API MyMemory)
         const translatedTitles = await Promise.all(items.map(item => translateTitle(item.title)));
 
         items.forEach((item, index) => {
             const card = document.createElement('div');
-            card.className = 'news-card';
+            card.className = `news-card ${theme === 'festival' ? 'festival' : ''}`;
 
-            const imgUrl = extractImage(item);
+            const imgUrl = extractImage(item, theme);
             const titleCa = translatedTitles[index];
 
             const tmp = document.createElement('div');
             tmp.innerHTML = item.description;
             const text = tmp.textContent || tmp.innerText || "";
             const summary = text.substring(0, 180) + "...";
+
+            const badgeHtml = theme === 'festival' ? '<div class="festival-badge">✨ ESPECIAL FESTIVAL</div>' : '';
 
             card.innerHTML = `
                 <div class="card-title">
@@ -87,6 +105,7 @@ window.onload = () => {
                     <img src="${imgUrl}" alt="Notícia Sitges" onerror="this.src='https://loremflickr.com/800/400/sitges?random=${Math.random()}'">
                 </div>
                 <div class="card-body">
+                    ${badgeHtml}
                     <p>${summary}</p>
                     <div class="card-actions">
                         <a href="${item.link}" target="_blank" class="btn-read">Llegir notícia completa &rarr;</a>
@@ -106,13 +125,29 @@ window.onload = () => {
         });
     }
 
+    function switchSection(section) {
+        currentSection = section;
+        feed.innerHTML = '<div id="loading-msg">Carregant la Veu de Sitges...</div>';
+        bannerTitle.textContent = FEEDS[section].title;
+
+        // Update nav links
+        linkGeneral.classList.toggle('active', section === 'general');
+        linkFestival.classList.toggle('active', section === 'festival');
+
+        fetchNews();
+    }
+
+    linkGeneral.onclick = (e) => { e.preventDefault(); switchSection('general'); };
+    linkFestival.onclick = (e) => { e.preventDefault(); switchSection('festival'); };
+
     modalClose.onclick = () => iaModal.style.display = 'none';
     window.onclick = (e) => { if (e.target == iaModal) iaModal.style.display = 'none'; };
 
     const observer = new IntersectionObserver((entries) => {
-        if (entries[0].isIntersecting) fetchNews();
+        if (entries[0].isIntersecting && !isFetching) fetchNews();
     }, { threshold: 0.1 });
     observer.observe(sentinel);
 
+    // Initial load
     fetchNews();
 };
