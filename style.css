@@ -120,6 +120,18 @@ nav a.active {
     font-weight: 600;
 }
 
+.translation-badge {
+    display: inline-block;
+    background: rgba(255, 255, 255, 0.2);
+    color: #fff;
+    padding: 0.2rem 0.5rem;
+    border-radius: 4px;
+    font-size: 0.6rem;
+    font-weight: 700;
+    margin-bottom: 0.4rem;
+    text-transform: uppercase;
+}
+
 .img-container {
     width: 100%;
     height: 250px;

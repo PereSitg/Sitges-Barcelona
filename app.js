@@ -22,14 +22,14 @@ window.onload = () => {
         'https://www.ccgarraf.cat/rss/14/0/'
     ];
 
-    const RSS_X = 'https://nitter.net/search/rss?f=tweets&q=%23sitges';
+    const RSS_X = 'https://nitter.poast.org/search/rss?f=tweets&q=%23sitges';
 
-    // Safe Images List (Curated)
+    // Safe Images List (Imatges d'Unsplash directes per màxima estabilitat)
     const SAFE_SITGES_IMAGES = [
-        'https://images.weserv.nl/?url=upload.wikimedia.org/wikipedia/commons/thumb/c/ca/Sitges_-_Esgl%C3%A9sia_de_Sant_Bartomeu_i_Santa_Tecla.jpg/1200px-Sitges_-_Esgl%C3%A9sia_de_Sant_Bartomeu_i_Santa_Tecla.jpg&w=800&fit=cover',
-        'https://images.weserv.nl/?url=upload.wikimedia.org/wikipedia/commons/thumb/a/ab/Sitges_%28Barcelona%29_-_Espanya.jpg/1200px-Sitges_%28Barcelona%29_-_Espanya.jpg&w=800&fit=cover',
-        'https://images.weserv.nl/?url=upload.wikimedia.org/wikipedia/commons/thumb/b/b3/Sitges_carrer.jpg/1200px-Sitges_carrer.jpg&w=800&fit=cover',
-        'https://images.weserv.nl/?url=upload.wikimedia.org/wikipedia/commons/thumb/8/87/Sitges_-_panoramio.jpg/1200px-Sitges_-_panoramio.jpg&w=800&fit=cover'
+        'https://images.unsplash.com/photo-1548175114-61c0bd664653?q=80&w=800&auto=format&fit=crop',
+        'https://images.unsplash.com/photo-1582260600171-89771ba0df8b?q=80&w=800&auto=format&fit=crop',
+        'https://images.unsplash.com/photo-1628155930542-3c7a64e2c833?q=80&w=800&auto=format&fit=crop',
+        'https://images.unsplash.com/photo-1506744038136-46273834b3fb?q=80&w=800&auto=format&fit=crop'
     ];
 
     let currentSection = 'general';
@@ -55,7 +55,7 @@ window.onload = () => {
             const match = item.description.match(/<img[^>]+src=["']([^"']+)["']/);
             if (match) url = match[1];
         }
-        if (url) {
+        if (url && !url.includes('google.com')) {
             const cleanUrl = url.replace(/^https?:\/\//, '');
             return `https://images.weserv.nl/?url=${cleanUrl}&w=800&fit=cover`;
         }
@@ -86,8 +86,9 @@ window.onload = () => {
             merged.sort((a, b) => new Date(b.pubDate) - new Date(a.pubDate));
             const uniqueTitles = new Set();
             allNewsItems = merged.filter(item => {
-                if (uniqueTitles.has(item.title)) return false;
-                uniqueTitles.add(item.title);
+                const cleanTitle = item.title.trim();
+                if (uniqueTitles.has(cleanTitle)) return false;
+                uniqueTitles.add(cleanTitle);
                 return true;
             });
         }
@@ -114,10 +115,13 @@ window.onload = () => {
             const tmp = document.createElement('div');
             tmp.innerHTML = item.description;
             const summary = (tmp.textContent || tmp.innerText || "").substring(0, 150) + "...";
-            const iaBtn = titleObj.translated ? '<button class="btn-ia">IA 🤖</button>' : '';
+
+            const iaBtnHtml = '<button class="btn-ia">IA 🤖</button>';
+            const badgeCa = titleObj.translated ? '' : '<span class="translation-badge">Pendent de traducció</span>';
 
             card.innerHTML = `
                 <div class="card-title">
+                    ${badgeCa}
                     <h2>${titleObj.text}</h2>
                     <span class="news-date">${date}</span>
                 </div>
@@ -126,29 +130,36 @@ window.onload = () => {
                     <p>${summary}</p>
                     <div class="card-actions">
                         <a href="${item.link}" target="_blank" class="btn-read">Llegir notícia &rarr;</a>
-                        ${iaBtn}
+                        ${iaBtnHtml}
                     </div>
                 </div>
             `;
-            if (titleObj.translated) {
-                card.querySelector('.btn-ia').onclick = () => {
-                    modalTitleEs.textContent = item.title;
-                    modalDescEs.textContent = tmp.textContent;
-                    modalLink.href = item.link;
-                    iaModal.style.display = 'flex';
-                };
-            }
+
+            card.querySelector('.btn-ia').onclick = () => {
+                modalTitleEs.textContent = item.title;
+                modalDescEs.textContent = tmp.textContent;
+                modalLink.href = item.link;
+                iaModal.style.display = 'flex';
+            };
+
             feed.appendChild(card);
         });
     }
 
     async function fetchX() {
+        if (!twitterFeed) return;
         const apiUrl = `https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(RSS_X)}&t=${Date.now()}`;
         try {
             const res = await fetch(apiUrl);
             const data = await res.json();
-            if (data.status === 'ok') renderX(data.items);
-        } catch (e) { console.error(e); }
+            if (data.status === 'ok' && data.items && data.items.length > 0) {
+                renderX(data.items);
+            } else {
+                twitterFeed.innerHTML = '<div style="padding:1rem; color:#888;">Xarxes no disponibles temporalment.</div>';
+            }
+        } catch (e) {
+            twitterFeed.innerHTML = '<div style="padding:1rem; color:#888;">No s\'han pogut carregar les xarxes.</div>';
+        }
     }
 
     function renderX(items) {
@@ -184,11 +195,11 @@ window.onload = () => {
     linkGeneral.onclick = (e) => { e.preventDefault(); switchSection('general'); };
     linkFestival.onclick = (e) => { e.preventDefault(); switchSection('festival'); };
     modalClose.onclick = () => iaModal.style.display = 'none';
+    window.onclick = (e) => { if (e.target == iaModal) iaModal.style.display = 'none'; };
 
     const obs = new IntersectionObserver((es) => { if (es[0].isIntersecting) fetchNews(); }, { threshold: 0.1 });
     obs.observe(sentinel);
 
-    // Init
     fetchNews(true);
     fetchX();
     setInterval(() => { fetchNews(true); fetchX(); }, 4 * 60 * 60 * 1000);
