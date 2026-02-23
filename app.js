@@ -8,10 +8,9 @@ window.onload = () => {
     const modalDescEs = document.getElementById('modal-desc-es');
     const modalLink = document.getElementById('modal-link');
 
-    // Detect active section from body attribute
+    // Detectem la secció segons l'atribut de la pàgina
     const currentSection = document.body.getAttribute('data-section') || 'general';
 
-    // Feeds Config
     const FEEDS_CONFIG = {
         general: [
             'https://news.google.com/rss/search?q=sitges&hl=es&gl=ES&ceid=ES%3Aes',
@@ -25,28 +24,22 @@ window.onload = () => {
         restaurants: ['https://news.google.com/rss/search?q=donde+comer+en+sitges&hl=es&gl=ES&ceid=ES%3Aes']
     };
 
+    // Llista d'instàncies Nitter per seguretat (fallback)
     const NITTER_INSTANCES = [
-        'https://nitter.poast.org',
         'https://nitter.net',
+        'https://nitter.poast.org',
         'https://nitter.cz',
-        'https://nitter.privacydev.net',
-        'https://nitter.perennialte.ch',
-        'https://nitter.moomoo.me',
-        'https://nitter.it',
-        'https://nitter.no-logs.com'
+        'https://nitter.privacydev.net'
     ];
 
-    // Biblioteca de SITGES real (Direct Unsplash per evitar hotlinking issues i weserv per la resta)
+    // Imatges de Sitges realment estables (Unsplash i Wikimedia directes)
     const SAFE_SITGES_IMAGES = [
         'https://images.unsplash.com/photo-1548175114-61c0bd664653?q=80&w=800&auto=format&fit=crop',
         'https://images.unsplash.com/photo-1582260600171-89771ba0df8b?q=80&w=800&auto=format&fit=crop',
         'https://images.unsplash.com/photo-1628155930542-3c7a64e2c833?q=80&w=800&auto=format&fit=crop',
-        'https://images.unsplash.com/photo-1506744038136-46273834b3fb?q=80&w=800&auto=format&fit=crop',
         'https://images.unsplash.com/photo-1544919982-b61976f0ba43?q=80&w=800&auto=format&fit=crop',
-        'https://images.unsplash.com/photo-1516483642774-3a32836c69bf?q=80&w=800&auto=format&fit=crop',
         'https://upload.wikimedia.org/wikipedia/commons/thumb/c/ca/Sitges_-_Esgl%C3%A9sia_de_Sant_Bartomeu_i_Santa_Tecla.jpg/800px-Sitges_-_Esgl%C3%A9sia_de_Sant_Bartomeu_i_Santa_Tecla.jpg',
-        'https://upload.wikimedia.org/wikipedia/commons/thumb/c/ca/Sitges_01.jpg/800px-Sitges_01.jpg',
-        'https://upload.wikimedia.org/wikipedia/commons/thumb/d/d6/Sitges_carrer_de_les_Parellades.jpg/800px-Sitges_carrer_de_les_Parellades.jpg'
+        'https://upload.wikimedia.org/wikipedia/commons/thumb/c/ca/Sitges_01.jpg/800px-Sitges_01.jpg'
     ];
 
     let isFetchingNews = false;
@@ -71,6 +64,7 @@ window.onload = () => {
             const match = item.description.match(/<img[^>]+src=["']([^"']+)["']/);
             if (match) url = match[1];
         }
+        // Evitem proxies que fallen, intentem weserv només si és segur
         if (url && !url.includes('google.com')) {
             const cleanUrl = url.replace(/^https?:\/\//, '');
             return `https://images.weserv.nl/?url=${cleanUrl}&w=800&fit=cover`;
@@ -88,7 +82,6 @@ window.onload = () => {
             feed.innerHTML = '<div id="loading-msg">Carregant la Veu de Sitges...</div>';
 
             const urls = FEEDS_CONFIG[currentSection] || FEEDS_CONFIG.general;
-
             const fetchPromises = urls.map(url => {
                 const apiUrl = `https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(url)}&t=${Date.now()}`;
                 return fetch(apiUrl).then(res => res.json()).catch(() => null);
@@ -165,17 +158,18 @@ window.onload = () => {
     async function fetchX(instanceIdx = 0) {
         if (!twitterFeed) return;
         if (instanceIdx >= NITTER_INSTANCES.length) {
-            twitterFeed.innerHTML = '<div style="padding:1.2rem; color:#888; text-align:center;">Xarxes no disponibles temporalment en cap servidor.</div>';
+            twitterFeed.innerHTML = '<div style="padding:1.2rem; color:#888; text-align:center;">Xarxes no disponibles temporalment.</div>';
             return;
         }
 
         const instance = NITTER_INSTANCES[instanceIdx];
-        const searchPath = '/search/rss?f=tweets&q=%23sitges';
-        const apiUrl = `https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(instance + searchPath)}&t=${Date.now()}`;
+        const rssUrl = `${instance}/search/rss?f=tweets&q=%23sitges`;
+
+        // Utilitzem rss2json per saltar CORS tal com demana l'expert
+        const apiUrl = `https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(rssUrl)}`;
 
         try {
             const res = await fetch(apiUrl);
-            if (!res.ok) throw new Error('Proxy error');
             const data = await res.json();
             if (data.status === 'ok' && data.items && data.items.length > 0) {
                 renderX(data.items);
@@ -214,7 +208,6 @@ window.onload = () => {
     const obs = new IntersectionObserver((es) => { if (es[0].isIntersecting) fetchNews(); }, { threshold: 0.1 });
     obs.observe(sentinel);
 
-    // Run
     fetchNews(true);
     fetchX();
     setInterval(() => { fetchNews(true); fetchX(); }, 4 * 60 * 60 * 1000);
