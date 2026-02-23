@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="ca">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LA VEU DE SITGES - Diari Automàtic</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Roboto:wght@300;400&display=swap"
+        rel="stylesheet">
+</head>
+
+<body>
+    <header>
+        <div class="header-content">
+            <h1>LA VEU DE SITGES</h1>
+            <nav>
+                <ul>
+                    <li><a href="#">Inici</a></li>
+                    <li><a href="#">Notícies</a></li>
+                    <li><a href="#">Restaurants</a></li>
+                    <li><a href="#">Contacte</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <div class="container">
+        <aside class="sidebar left-sidebar">
+            <section class="sidebar-box">
+                <h3>Destacat</h3>
+                <p>Informació local al moment.</p>
+            </section>
+        </aside>
+
+        <main id="feed">
+            <!-- Les notícies es carregaran aquí dinàmicament -->
+        </main>
+
+        <aside class="sidebar right-sidebar">
+            <section class="sidebar-box">
+                <h3>Agenda</h3>
+                <p>Propers esdeveniments a Sitges.</p>
+            </section>
+        </aside>
+    </div>
+
+    <div id="loading" class="loading-trigger">
+        <p>Carregant més notícies...</p>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+
+</html>
