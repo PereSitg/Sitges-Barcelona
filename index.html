@@ -4,8 +4,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LA VEU DE SITGES - Diari Automàtic</title>
-    <link rel="stylesheet" href="style.css">
+    <title>LA VEU DE SITGES</title>
+    <!-- Cache Busters to ensure user sees the fix -->
+    <link rel="stylesheet" href="style.css?v=7.0">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link
@@ -15,9 +16,9 @@
 
 <body>
     <header>
-        <div class="header-content">
-            <h1>LA VEU DE SITGES</h1>
-            <nav id="main-nav">
+        <div class="header-inner">
+            <h1 id="main-title">LA VEU DE SITGES</h1>
+            <nav id="navbar">
                 <ul>
                     <li><a href="#">Inici</a></li>
                     <li><a href="#">Notícies</a></li>
@@ -28,33 +29,19 @@
         </div>
     </header>
 
-    <div class="container">
-        <aside class="sidebar side-left">
-            <section class="widget">
-                <h3>Destacat</h3>
-                <p>Informació local de darrera hora sobre Sitges i el Garraf.</p>
-            </section>
-        </aside>
-
-        <main id="feed">
-            <div id="welcome-msg" style="text-align:center; padding:3rem;">
-                <p>Carregant les cròniques més recents...</p>
+    <div class="main-container">
+        <div id="feed">
+            <div id="status-msg">
+                <p>Preparant l'edició d'avui...</p>
             </div>
-        </main>
-
-        <aside class="sidebar side-right">
-            <section class="widget">
-                <h3>Agenda</h3>
-                <p>Consulta els propers esdeveniments culturals i festius de la vila.</p>
-            </section>
-        </aside>
+        </div>
     </div>
 
-    <div id="infinite-trigger" style="height: 100px; text-align: center; padding: 20px 0;">
-        <span id="load-msg" style="color: #888; font-size: 0.9rem;">Cercant més notícies...</span>
+    <div id="footer-trigger">
+        <p>Cercant més cròniques...</p>
     </div>
 
-    <script src="app.js"></script>
+    <script src="app.js?v=7.0"></script>
 </body>
 
 </html>
