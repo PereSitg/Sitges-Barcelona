@@ -24,12 +24,20 @@ window.onload = () => {
 
     const RSS_X = 'https://nitter.poast.org/search/rss?f=tweets&q=%23sitges';
 
-    // Safe Images List (Imatges d'Unsplash directes per màxima estabilitat)
+    // Safe Images List - Una llibreria més àmplia i específica de SITGES (i no genèrica)
     const SAFE_SITGES_IMAGES = [
-        'https://images.unsplash.com/photo-1548175114-61c0bd664653?q=80&w=800&auto=format&fit=crop',
-        'https://images.unsplash.com/photo-1582260600171-89771ba0df8b?q=80&w=800&auto=format&fit=crop',
-        'https://images.unsplash.com/photo-1628155930542-3c7a64e2c833?q=80&w=800&auto=format&fit=crop',
-        'https://images.unsplash.com/photo-1506744038136-46273834b3fb?q=80&w=800&auto=format&fit=crop'
+        'https://images.weserv.nl/?url=www.visitsitges.com/wp-content/uploads/2020/09/esglesia-sitges-barcelona.jpg&w=800&fit=cover',
+        'https://images.weserv.nl/?url=www.visitsitges.com/wp-content/uploads/2021/04/platja-sant-sebastia-sitges.jpg&w=800&fit=crop',
+        'https://images.weserv.nl/?url=www.sitgesanytime.com/media/site/carrer-den-bosch.jpg&w=800&fit=crop',
+        'https://images.weserv.nl/?url=www.sitgesanytime.com/media/site/baluard-vidal-i-quadras.jpg&w=800&fit=crop',
+        'https://images.weserv.nl/?url=www.sitgesanytime.com/media/site/rac-de-la-calma.jpg&w=800&fit=crop',
+        'https://images.weserv.nl/?url=www.visitsitges.com/wp-content/uploads/2022/01/port-aiguadolç-sitges.jpg&w=800&fit=crop'
+    ];
+
+    const NITTER_INSTANCES = [
+        'https://nitter.poast.org',
+        'https://nitter.cz',
+        'https://nitter.privacydev.net'
     ];
 
     let currentSection = 'general';
