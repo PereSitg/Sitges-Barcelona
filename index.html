@@ -4,8 +4,38 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LA VEU DE SITGES</title>
-    <link rel="stylesheet" href="style.css?v=9.0">
+    <title>LA VEU DE SITGES - El Diari Digital de la Blanca Subur</title>
+
+    <!-- SEO Meta Tags -->
+    <meta name="description"
+        content="Tota l'actualitat de Sitges en un sol clic. Notícies d'última hora, el Sitges Film Festival, esdeveniments, cultura i societat de Sitges.">
+    <meta name="keywords"
+        content="Sitges, notícies Sitges, Sitges Film Festival, actualitat Sitges, diari Sitges, Garraf, cinema Sitges, esdeveniments Sitges">
+    <meta name="author" content="La Veu de Sitges">
+    <meta name="robots" content="index, follow">
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://perebadia.github.io/la-veu-de-sitges/">
+    <meta property="og:title" content="LA VEU DE SITGES - El Diari Digital de la Blanca Subur">
+    <meta property="og:description"
+        content="Tota l'actualitat de Sitges, el Festival de Cinema i més. El teu punt d'informació diari.">
+    <meta property="og:image" content="https://loremflickr.com/1200/630/sitges,church">
+
+    <!-- JSON-LD Structured Data -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "NewsMediaOrganization",
+      "name": "La Veu de Sitges",
+      "url": "https://perebadia.github.io/la-veu-de-sitges/",
+      "logo": "https://loremflickr.com/500/500/sitges,logo",
+      "sameAs": [],
+      "description": "Diari digital dedicat a l'actualitat de Sitges i el seu prestigiós Festival Internacional de Cinema."
+    }
+    </script>
+
+    <link rel="stylesheet" href="style.css?v=10.0">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link
@@ -28,10 +58,25 @@
         </div>
     </header>
 
-    <div class="main-layout">
-        <main id="feed">
-            <div id="loading-msg">Carregant la Veu de Sitges...</div>
-        </main>
+    <div class="main-container">
+        <div class="content-grid">
+            <!-- Columna Esquerra: Notícies -->
+            <section class="main-column">
+                <main id="feed">
+                    <div id="loading-msg">Carregant la Veu de Sitges...</div>
+                </main>
+            </section>
+
+            <!-- Columna Dreta: Xarxes -->
+            <aside class="sidebar-column">
+                <div class="sidebar-header">
+                    <h2>SITGES A X</h2>
+                </div>
+                <div id="twitter-feed">
+                    <div id="loading-x">Carregant darrers tuits...</div>
+                </div>
+            </aside>
+        </div>
     </div>
 
     <div id="sentinel"></div>
@@ -51,7 +96,16 @@
         </div>
     </div>
 
-    <script src="app.js?v=9.0"></script>
+    <footer class="site-footer">
+        <div class="footer-content">
+            <p>&copy; 2026 <strong>LA VEU DE SITGES</strong>. El diari digital independent d'actualitat, cultura i el
+                <strong>Sitges Film Festival</strong>.
+            </p>
+            <p>La Blanca Subur, Catalunya.</p>
+        </div>
+    </footer>
+
+    <script src="app.js?v=10.0"></script>
 </body>
 
 </html>
