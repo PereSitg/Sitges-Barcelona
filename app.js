@@ -13,6 +13,18 @@ window.onload = () => {
     // Official developer placeholder (guaranteed stable)
     const PLACEHOLDER_IMAGE = "https://placehold.jp/800020/ffffff/800x600.png?text=LA%20VEU%20DE%20SITGES";
 
+    // Biblioteca de fotos de SITGES professionals - Perquè la web es vegi de luxe fins i tot sense fotos a les notícies
+    const REAL_SITGES_FALLBACKS = [
+        'https://images.unsplash.com/photo-1548175114-61c0bd664653?q=80&w=800&auto=format&fit=crop',
+        'https://images.unsplash.com/photo-1582260600171-89771ba0df8b?q=80&w=800&auto=format&fit=crop',
+        'https://images.unsplash.com/photo-1628155930542-3c7a64e2c833?q=80&w=800&auto=format&fit=crop',
+        'https://images.unsplash.com/photo-1506744038136-46273834b3fb?q=80&w=800&auto=format&fit=crop',
+        'https://images.unsplash.com/photo-1544919982-b61976f0ba43?q=80&w=800&auto=format&fit=crop',
+        'https://images.unsplash.com/photo-1516483642774-3a32836c69bf?q=80&w=800&auto=format&fit=crop',
+        'https://upload.wikimedia.org/wikipedia/commons/thumb/c/ca/Sitges_-_Esgl%C3%A9sia_de_Sant_Bartomeu_i_Santa_Tecla.jpg/800px-Sitges_-_Esgl%C3%A9sia_de_Sant_Bartomeu_i_Santa_Tecla.jpg',
+        'https://upload.wikimedia.org/wikipedia/commons/thumb/c/ca/Sitges_01.jpg/800px-Sitges_01.jpg'
+    ];
+
     const FEEDS_CONFIG = {
         general: [
             'https://news.google.com/rss/search?q=sitges&hl=es&gl=ES&ceid=ES%3Aes',
@@ -23,7 +35,7 @@ window.onload = () => {
             'https://www.ccgarraf.cat/rss/14/0/'
         ],
         festival: ['https://news.google.com/rss/search?q=festival%20cinema%20sitges&hl=es&gl=ES&ceid=ES%3Aes'],
-        restaurants: [] // Clean section (no news)
+        restaurants: [] // Neta de notícies
     };
 
     let isFetchingNews = false;
@@ -41,7 +53,6 @@ window.onload = () => {
         } catch (e) { return { text: baseTitle, translated: false }; }
     }
 
-    // Expert Image Extraction with Fallback
     function extractImage(item) {
         let url = '';
         if (item.enclosure && item.enclosure.link) url = item.enclosure.link;
@@ -52,10 +63,11 @@ window.onload = () => {
         }
 
         if (url && !url.includes('google.com')) {
-            // Using wsrv.nl as it's the most reliable public image proxy
+            // Proxy wsrv.nl per garantir càrrega i evitar hotlinking blocks
             return `https://wsrv.nl/?url=${encodeURIComponent(url)}&w=800&fit=cover`;
         }
-        return PLACEHOLDER_IMAGE;
+        // Si no hi ha foto a la notícia, usem una d'una biblioteca real de Sitges aleatòria
+        return REAL_SITGES_FALLBACKS[Math.floor(Math.random() * REAL_SITGES_FALLBACKS.length)];
     }
 
     async function fetchNews(isInitial = false) {
@@ -146,5 +158,5 @@ window.onload = () => {
     obs.observe(sentinel);
 
     fetchNews(true);
-    // Note: Twitter Widget is handled by the static script in HTML for official support
+    // El widget de Twitter oficial es carrega via HTML estàtic per màxima compatibilitat
 };

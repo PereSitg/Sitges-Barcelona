@@ -4,8 +4,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LA VEU DE SITGES - Inici</title>
-    <link rel="stylesheet" href="style.css?v=70.0">
+    <title>LA VEU DE SITGES - Sitges Film festival</title>
+    <link rel="stylesheet" href="../style.css?v=70.0">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link
@@ -13,15 +13,15 @@
         rel="stylesheet">
 </head>
 
-<body data-section="general">
+<body data-section="festival">
     <header>
         <div class="header-content">
-            <h1 onclick="window.location.href='index.html'" style="cursor:pointer">LA VEU DE SITGES</h1>
+            <h1 onclick="window.location.href='../index.html'" style="cursor:pointer">LA VEU DE SITGES</h1>
             <nav id="navbar">
                 <ul>
-                    <li><a href="index.html" class="active">Inici</a></li>
-                    <li><a href="sitges-film-festival/">Sitges Film festival</a></li>
-                    <li><a href="donde-comer-en-sitges/">Donde comer en Sitges</a></li>
+                    <li><a href="../index.html">Inici</a></li>
+                    <li><a href="../sitges-film-festival/" class="active">Sitges Film festival</a></li>
+                    <li><a href="../donde-comer-en-sitges/">Donde comer en Sitges</a></li>
                     <li><a href="#">Contacte</a></li>
                 </ul>
             </nav>
@@ -33,9 +33,9 @@
             <section class="main-column">
                 <h2 class="section-title-label"
                     style="color: #800020; font-family: 'Playfair Display', serif; margin-bottom: 1.5rem; text-transform: uppercase; font-size: 1.2rem; border-bottom: 2px solid #800020; padding-bottom: 0.5rem;">
-                    Inici</h2>
+                    Sitges Film festival</h2>
                 <main id="feed">
-                    <div id="loading-msg">Carregant la Veu de Sitges...</div>
+                    <div id="loading-msg">Carregant notícies del Festival...</div>
                 </main>
             </section>
 
@@ -44,7 +44,6 @@
                     <h2>SITGES A X</h2>
                 </div>
                 <div id="twitter-feed" style="min-height:600px; background:white; overflow:hidden;">
-                    <!-- Widget oficial de Twitter garantit -->
                     <a class="twitter-timeline" data-height="600" data-theme="light"
                         href="https://twitter.com/hashtag/sitges">#sitges Tweets</a>
                 </div>
@@ -75,8 +74,7 @@
         </div>
     </footer>
 
-    <script src="app.js?v=70.0"></script>
-    <!-- Script de Twitter al final per assegurar que carrega -->
+    <script src="../app.js?v=70.0"></script>
     <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
 </body>
 
