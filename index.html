@@ -4,28 +4,54 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LA VEU DE SITGES</title>
+    <title>LA VEU DE SITGES - Diari Automàtic</title>
     <link rel="stylesheet" href="style.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link
-        href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Inter:wght@400;500&display=swap"
+        href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;800&family=Inter:wght@400;600;700&display=swap"
         rel="stylesheet">
 </head>
 
 <body>
     <header>
-        <div class="header-inner">
+        <div class="header-content">
             <h1>LA VEU DE SITGES</h1>
+            <nav id="main-nav">
+                <ul>
+                    <li><a href="#">Inici</a></li>
+                    <li><a href="#">Notícies</a></li>
+                    <li><a href="#">Restaurants</a></li>
+                    <li><a href="#">Contacte</a></li>
+                </ul>
+            </nav>
         </div>
     </header>
 
-    <main id="feed">
-        <!-- Notícies injectades per JS -->
-    </main>
+    <div class="container">
+        <aside class="sidebar side-left">
+            <section class="widget">
+                <h3>Destacat</h3>
+                <p>Informació local de darrera hora sobre Sitges i el Garraf.</p>
+            </section>
+        </aside>
 
-    <div id="loader" class="loader">
-        <p>Actualitzant la Veu...</p>
+        <main id="feed">
+            <div id="welcome-msg" style="text-align:center; padding:3rem;">
+                <p>Carregant les cròniques més recents...</p>
+            </div>
+        </main>
+
+        <aside class="sidebar side-right">
+            <section class="widget">
+                <h3>Agenda</h3>
+                <p>Consulta els propers esdeveniments culturals i festius de la vila.</p>
+            </section>
+        </aside>
+    </div>
+
+    <div id="infinite-trigger" style="height: 100px; text-align: center; padding: 20px 0;">
+        <span id="load-msg" style="color: #888; font-size: 0.9rem;">Cercant més notícies...</span>
     </div>
 
     <script src="app.js"></script>
