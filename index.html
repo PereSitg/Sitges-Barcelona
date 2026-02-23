@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>LA VEU DE SITGES - Inici</title>
-    <link rel="stylesheet" href="style.css?v=50.0">
+    <link rel="stylesheet" href="style.css?v=60.0">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link
@@ -43,8 +43,12 @@
                 <div class="sidebar-header">
                     <h2>SITGES A X</h2>
                 </div>
-                <div id="twitter-feed">
-                    <div id="loading-x">Carregant darrers tuits...</div>
+                <div id="twitter-feed"
+                    style="min-height:600px; background: #f9f9f9; padding: 1rem; border-radius: 8px;">
+                    <!-- Official Twitter Widget with #sitges -->
+                    <a class="twitter-timeline" data-height="600" data-theme="light"
+                        href="https://twitter.com/hashtag/sitges">#sitges Tweets</a>
+                    <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
                 </div>
             </aside>
         </div>
@@ -73,7 +77,7 @@
         </div>
     </footer>
 
-    <script src="app.js?v=50.0"></script>
+    <script src="app.js?v=60.0"></script>
 </body>
 
 </html>
