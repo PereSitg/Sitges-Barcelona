@@ -125,7 +125,9 @@ window.onload = () => {
                     <h2>${titleObj.text}</h2>
                     <span class="news-date">${date}</span>
                 </div>
-                <div class="img-container"><img src="${imgUrl}" alt="Sitges"></div>
+                <div class="img-container">
+                    <img src="${imgUrl}" alt="Sitges" onerror="this.src='${SAFE_SITGES_IMAGES[Math.floor(Math.random() * SAFE_SITGES_IMAGES.length)]}'">
+                </div>
                 <div class="card-body">
                     <p>${summary}</p>
                     <div class="card-actions">
