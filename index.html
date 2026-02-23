@@ -9,7 +9,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link
-        href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Roboto:wght@300;400&display=swap"
+        href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;800&family=Inter:wght@400;600;700&display=swap"
         rel="stylesheet">
 </head>
 
@@ -32,24 +32,26 @@
         <aside class="sidebar left-sidebar">
             <section class="sidebar-box">
                 <h3>Destacat</h3>
-                <p>Informació local al moment.</p>
+                <p>Informació local de darrera hora sobre Sitges i el Garraf.</p>
             </section>
         </aside>
 
         <main id="feed">
-            <!-- Les notícies es carregaran aquí dinàmicament -->
+            <div style="text-align:center; padding:3rem;">
+                <p>Connectant amb la Veu de Sitges...</p>
+            </div>
         </main>
 
         <aside class="sidebar right-sidebar">
             <section class="sidebar-box">
                 <h3>Agenda</h3>
-                <p>Propers esdeveniments a Sitges.</p>
+                <p>Consulta els propers esdeveniments culturals i festius.</p>
             </section>
         </aside>
     </div>
 
-    <div id="loading" class="loading-trigger">
-        <p>Carregant més notícies...</p>
+    <div id="loading" class="loading-trigger" style="display:none;">
+        <p>Cercant més cròniques...</p>
     </div>
 
     <script src="app.js"></script>
