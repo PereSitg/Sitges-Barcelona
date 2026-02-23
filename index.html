@@ -4,9 +4,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LA VEU DE SITGES</title>
-    <!-- Cache Busters to ensure user sees the fix -->
-    <link rel="stylesheet" href="style.css?v=7.0">
+    <title>LA VEU DE SITGES - Diari IA</title>
+    <link rel="stylesheet" href="style.css?v=8.0">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link
@@ -16,9 +15,9 @@
 
 <body>
     <header>
-        <div class="header-inner">
-            <h1 id="main-title">LA VEU DE SITGES</h1>
-            <nav id="navbar">
+        <div class="header-content">
+            <h1>LA VEU DE SITGES</h1>
+            <nav>
                 <ul>
                     <li><a href="#">Inici</a></li>
                     <li><a href="#">Notícies</a></li>
@@ -29,19 +28,49 @@
         </div>
     </header>
 
-    <div class="main-container">
-        <div id="feed">
-            <div id="status-msg">
-                <p>Preparant l'edició d'avui...</p>
+    <div class="main-layout">
+        <aside class="sidebar left">
+            <div class="sidebar-box">
+                <h3>Edició Local</h3>
+                <p>Notícies d'actualitat de Sitges i el Garraf optimitzades per IA.</p>
+            </div>
+        </aside>
+
+        <main id="feed">
+            <!-- Les notícies es carreguen aquí -->
+        </main>
+
+        <aside class="sidebar right">
+            <div class="sidebar-box">
+                <h3>Agenda</h3>
+                <p>Propers esdeveniments, cultura i festes sitgetanes.</p>
+            </div>
+        </aside>
+    </div>
+
+    <!-- Element Sentinella per Scroll Infinit -->
+    <div id="sentinel">
+        <div class="infinite-loader">
+            <span>Cercant més cròniques...</span>
+        </div>
+    </div>
+
+    <!-- Modal IA -->
+    <div id="ia-modal" class="modal-backdrop">
+        <div class="modal-content">
+            <button class="modal-close">&times;</button>
+            <div class="modal-header">
+                <span class="modal-badge">IA 🤖 - Versió Original</span>
+                <h2 id="modal-title-es"></h2>
+            </div>
+            <div class="modal-body">
+                <p id="modal-desc-es"></p>
+                <a id="modal-link" href="#" target="_blank" class="btn-full-article">Llegir article complet</a>
             </div>
         </div>
     </div>
 
-    <div id="footer-trigger">
-        <p>Cercant més cròniques...</p>
-    </div>
-
-    <script src="app.js?v=7.0"></script>
+    <script src="app.js?v=8.0"></script>
 </body>
 
 </html>
