@@ -7,8 +7,8 @@ window.onload = () => {
     const modalDescEs = document.getElementById('modal-desc-es');
     const modalLink = document.getElementById('modal-link');
 
+    // Feed in Catalan to avoid translation issues
     const rssUrl = 'https://news.google.com/rss/search?q=sitges&hl=ca&gl=ES&ceid=ES%3Aca';
-    // Nota: Hem canviat l'RSS a hl=ca directament per estalviar traduccions pesades que causen errors.
     const apiUrl = `https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(rssUrl)}&t=${Date.now()}`;
 
     let isFetching = false;
@@ -20,7 +20,7 @@ window.onload = () => {
         try {
             const res = await fetch(apiUrl);
             const data = await res.json();
-            if (data.status !== 'ok') throw new Error('API sanchat');
+            if (data.status !== 'ok') throw new Error('API Error');
 
             renderNews(data.items);
         } catch (e) {
@@ -31,21 +31,20 @@ window.onload = () => {
     }
 
     function extractImage(item) {
-        // En Google News RSS, la imatge pot estar en enclosures o descripció
         let url = '';
-        if (item.enclosure && item.enclosure.link) url = item.enclosure.link;
-        else {
+        if (item.enclosure && item.enclosure.link) {
+            url = item.enclosure.link;
+        } else {
+            // Regex to find img src in description
             const match = item.description.match(/<img[^>]+src=["']([^"']+)["']/);
             if (match) url = match[1];
         }
 
         if (!url) return null;
 
-        // Proxy robust: weserv.nl
-        // Google News usa URLs tipus lh3.googleusercontent.com, que sovint funcionen sense proxy si les servim bé
-        // però per CORS obligatori usarem el proxy com demana el client
+        // Requirement: Serve via https://images.weserv.nl/?url= removing "https://"
         const cleanUrl = url.replace(/^https?:\/\//, '');
-        return `https://images.weserv.nl/?url=${cleanUrl}&w=800&fit=cover`;
+        return `https://images.weserv.nl/?url=${cleanUrl}`;
     }
 
     function renderNews(items) {
@@ -55,18 +54,17 @@ window.onload = () => {
             const card = document.createElement('div');
             card.className = 'news-card';
 
+            const cleanTitle = item.title.split(' - ')[0];
             const imgUrl = extractImage(item);
-            const cleanTitle = item.title.split(' - ')[0]; // Treiem el nom del medi al final
 
-            // Per la descripció, netegem el HTML
             const tmp = document.createElement('div');
             tmp.innerHTML = item.description;
             const text = tmp.textContent || tmp.innerText || "";
             const summary = text.substring(0, 180) + "...";
 
             const imgHtml = imgUrl
-                ? `<div class="img-container"><img src="${imgUrl}" alt="Notícia" onerror="this.parentElement.style.display='none'"></div>`
-                : '';
+                ? `<div class="img-container"><img src="${imgUrl}" alt="Notícia" onerror="this.parentElement.innerHTML='<div class=\"placeholder-logo\">LA VEU DE SITGES</div>'"></div>`
+                : `<div class="img-container"><div class="placeholder-logo">LA VEU DE SITGES</div></div>`;
 
             card.innerHTML = `
                 <div class="card-title">
@@ -82,7 +80,6 @@ window.onload = () => {
                 </div>
             `;
 
-            // Modal IA
             card.querySelector('.btn-ia').onclick = () => {
                 modalTitleEs.textContent = item.title;
                 modalDescEs.textContent = text;
@@ -97,7 +94,6 @@ window.onload = () => {
     modalClose.onclick = () => iaModal.style.display = 'none';
     window.onclick = (e) => { if (e.target == iaModal) iaModal.style.display = 'none'; };
 
-    // Scroll Infinit
     const observer = new IntersectionObserver((entries) => {
         if (entries[0].isIntersecting) fetchNews();
     }, { threshold: 0.1 });

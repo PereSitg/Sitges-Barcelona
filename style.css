@@ -13,7 +13,7 @@
 
 body {
     font-family: 'Inter', sans-serif;
-    background-color: #fff;
+    background-color: #f7f7f7;
     color: var(--text-dark);
 }
 
@@ -55,7 +55,7 @@ nav a {
 }
 
 .main-layout {
-    max-width: 800px;
+    max-width: 700px;
     margin: 2rem auto;
     padding: 0 1rem;
 }
@@ -67,11 +67,12 @@ nav a {
 }
 
 .news-card {
+    background: #fff;
     border: 1px solid #eee;
-    margin-bottom: 2.5rem;
+    margin-bottom: 3rem;
     border-radius: 12px;
     overflow: hidden;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.05);
 }
 
 .card-title {
@@ -88,11 +89,12 @@ nav a {
 
 .img-container {
     width: 100%;
-    height: 250px;
-    background-color: #f5f5f5;
+    height: 280px;
+    background-color: #f0f0f0;
     display: flex;
     align-items: center;
     justify-content: center;
+    overflow: hidden;
 }
 
 .img-container img {
@@ -101,13 +103,23 @@ nav a {
     object-fit: cover;
 }
 
+.placeholder-logo {
+    font-family: 'Playfair Display', serif;
+    font-weight: 800;
+    color: #ccc;
+    font-size: 1.8rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
 .card-body {
-    padding: 1.5rem;
+    padding: 1.8rem;
 }
 
 .card-body p {
     margin-bottom: 1.5rem;
     color: #444;
+    font-size: 1.05rem;
 }
 
 .card-actions {
@@ -121,7 +133,7 @@ nav a {
     text-decoration: none;
     flex: 1;
     text-align: center;
-    padding: 0.8rem;
+    padding: 1rem;
     border-radius: 8px;
     font-weight: 700;
 }
@@ -129,7 +141,7 @@ nav a {
 .btn-ia {
     background: #f1f1f1;
     border: 1px solid #ddd;
-    padding: 0 1rem;
+    padding: 0 1.2rem;
     border-radius: 8px;
     cursor: pointer;
     font-size: 1rem;
@@ -142,7 +154,8 @@ nav a {
     left: 0;
     width: 100%;
     height: 100%;
-    background: rgba(0, 0, 0, 0.5);
+    background: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(4px);
     display: none;
     align-items: center;
     justify-content: center;
@@ -151,25 +164,37 @@ nav a {
 
 .modal-content {
     background: #fff;
-    padding: 2rem;
+    padding: 2.5rem;
     width: 90%;
-    max-width: 500px;
-    border-radius: 12px;
+    max-width: 550px;
+    border-radius: 16px;
     position: relative;
 }
 
 .modal-close {
     position: absolute;
-    top: 0.5rem;
-    right: 1rem;
+    top: 1rem;
+    right: 1.5rem;
     border: none;
     background: none;
-    font-size: 1.5rem;
+    font-size: 2rem;
     cursor: pointer;
+    color: #999;
 }
 
 .modal-header h2 {
     font-family: 'Playfair Display', serif;
+    margin-bottom: 1rem;
+    color: var(--burgundy);
+}
+
+.modal-badge {
+    display: inline-block;
+    background: #eee;
+    padding: 0.2rem 0.5rem;
+    border-radius: 4px;
+    font-size: 0.7rem;
+    font-weight: 800;
     margin-bottom: 1rem;
 }
 
@@ -178,24 +203,29 @@ nav a {
     background: var(--burgundy);
     color: #fff;
     text-align: center;
-    padding: 0.8rem;
+    padding: 1rem;
     border-radius: 8px;
-    margin-top: 1.5rem;
+    margin-top: 2rem;
     text-decoration: none;
     font-weight: 700;
 }
 
 #sentinel {
-    height: 50px;
+    height: 100px;
 }
 
 @media (max-width: 600px) {
     .header-content {
         flex-direction: column;
         gap: 1rem;
+        text-align: center;
     }
 
     .card-actions {
         flex-direction: column;
+    }
+
+    .img-container {
+        height: 200px;
     }
 }
