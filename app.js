@@ -7,7 +7,7 @@ window.onload = () => {
     const modalDescEs = document.getElementById('modal-desc-es');
     const modalLink = document.getElementById('modal-link');
 
-    const bannerTitle = document.getElementById('current-section-title');
+    const brandLink = document.getElementById('brand-link');
     const linkGeneral = document.getElementById('link-general');
     const linkFestival = document.getElementById('link-festival');
 
@@ -15,12 +15,10 @@ window.onload = () => {
     const FEEDS = {
         general: {
             url: 'https://news.google.com/rss/search?q=sitges&hl=es&gl=ES&ceid=ES%3Aes',
-            title: 'Cròniques de Sitges',
             theme: 'default'
         },
         festival: {
             url: 'https://news.google.com/rss/search?q=festival%20cinema%20sitges&hl=es&gl=ES&ceid=ES%3Aes',
-            title: 'Sitges Film Festival',
             theme: 'festival'
         }
     };
@@ -128,7 +126,6 @@ window.onload = () => {
     function switchSection(section) {
         currentSection = section;
         feed.innerHTML = '<div id="loading-msg">Carregant la Veu de Sitges...</div>';
-        bannerTitle.textContent = FEEDS[section].title;
 
         // Update nav links
         linkGeneral.classList.toggle('active', section === 'general');
@@ -138,6 +135,7 @@ window.onload = () => {
         fetchNews();
     }
 
+    brandLink.onclick = () => switchSection('general');
     linkGeneral.onclick = (e) => { e.preventDefault(); switchSection('general'); };
     linkFestival.onclick = (e) => { e.preventDefault(); switchSection('festival'); };
 
