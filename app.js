@@ -7,11 +7,23 @@ window.onload = () => {
     const modalDescEs = document.getElementById('modal-desc-es');
     const modalLink = document.getElementById('modal-link');
 
-    // Feed in Catalan to avoid translation issues
-    const rssUrl = 'https://news.google.com/rss/search?q=sitges&hl=ca&gl=ES&ceid=ES%3Aca';
+    // Tornem al feed en Castellà per tenir totes les notícies
+    const rssUrl = 'https://news.google.com/rss/search?q=sitges&hl=es&gl=ES&ceid=ES%3Aes';
     const apiUrl = `https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(rssUrl)}&t=${Date.now()}`;
 
     let isFetching = false;
+
+    async function translateTitle(title) {
+        try {
+            // Netegem el títol d'extensió de font "- La Vanguardia", etc
+            const baseTitle = title.split(' - ')[0];
+            const res = await fetch(`https://api.mymemory.translated.net/get?q=${encodeURIComponent(baseTitle)}&langpair=es|ca`);
+            const data = await res.json();
+            return data.responseData.translatedText || baseTitle;
+        } catch (e) {
+            return title.split(' - ')[0]; // Fallback al títol net en castellà
+        }
+    }
 
     async function fetchNews() {
         if (isFetching) return;
@@ -20,7 +32,7 @@ window.onload = () => {
         try {
             const res = await fetch(apiUrl);
             const data = await res.json();
-            if (data.status !== 'ok') throw new Error('API Error');
+            if (data.status !== 'ok') throw new Error('API sanchat');
 
             renderNews(data.items);
         } catch (e) {
@@ -35,42 +47,45 @@ window.onload = () => {
         if (item.enclosure && item.enclosure.link) {
             url = item.enclosure.link;
         } else {
-            // Regex to find img src in description
             const match = item.description.match(/<img[^>]+src=["']([^"']+)["']/);
             if (match) url = match[1];
         }
 
-        if (!url) return null;
+        if (url) {
+            const cleanUrl = url.replace(/^https?:\/\//, '');
+            return `https://images.weserv.nl/?url=${cleanUrl}&w=800&fit=cover`;
+        }
 
-        // Requirement: Serve via https://images.weserv.nl/?url= removing "https://"
-        const cleanUrl = url.replace(/^https?:\/\//, '');
-        return `https://images.weserv.nl/?url=${cleanUrl}`;
+        // --- REQUISIT: Si no hi ha imatge, en busquem una del tema ---
+        // Usem LoremFlickr amb el tag "sitges,spain" per garantir una foto d'acord amb el tema
+        return `https://loremflickr.com/800/400/sitges,spain?random=${Math.random()}`;
     }
 
-    function renderNews(items) {
+    async function renderNews(items) {
         if (feed.querySelector('#loading-msg')) feed.innerHTML = '';
 
-        items.forEach(item => {
+        // Traduccions en paral·lel dels títols (només títols per no saturar l'API MyMemory)
+        const translatedTitles = await Promise.all(items.map(item => translateTitle(item.title)));
+
+        items.forEach((item, index) => {
             const card = document.createElement('div');
             card.className = 'news-card';
 
-            const cleanTitle = item.title.split(' - ')[0];
             const imgUrl = extractImage(item);
+            const titleCa = translatedTitles[index];
 
             const tmp = document.createElement('div');
             tmp.innerHTML = item.description;
             const text = tmp.textContent || tmp.innerText || "";
             const summary = text.substring(0, 180) + "...";
 
-            const imgHtml = imgUrl
-                ? `<div class="img-container"><img src="${imgUrl}" alt="Notícia" onerror="this.parentElement.innerHTML='<div class=\"placeholder-logo\">LA VEU DE SITGES</div>'"></div>`
-                : `<div class="img-container"><div class="placeholder-logo">LA VEU DE SITGES</div></div>`;
-
             card.innerHTML = `
                 <div class="card-title">
-                    <h2>${cleanTitle}</h2>
+                    <h2>${titleCa}</h2>
                 </div>
-                ${imgHtml}
+                <div class="img-container">
+                    <img src="${imgUrl}" alt="Notícia Sitges" onerror="this.src='https://loremflickr.com/800/400/sitges?random=${Math.random()}'">
+                </div>
                 <div class="card-body">
                     <p>${summary}</p>
                     <div class="card-actions">
