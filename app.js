@@ -27,20 +27,26 @@ window.onload = () => {
 
     const NITTER_INSTANCES = [
         'https://nitter.poast.org',
+        'https://nitter.net',
         'https://nitter.cz',
         'https://nitter.privacydev.net',
         'https://nitter.perennialte.ch',
-        'https://nitter.moomoo.me'
+        'https://nitter.moomoo.me',
+        'https://nitter.it',
+        'https://nitter.no-logs.com'
     ];
 
-    // Biblioteca de SITGES real (Direct Unsplash per evitar hotlinking issues)
+    // Biblioteca de SITGES real (Direct Unsplash per evitar hotlinking issues i weserv per la resta)
     const SAFE_SITGES_IMAGES = [
         'https://images.unsplash.com/photo-1548175114-61c0bd664653?q=80&w=800&auto=format&fit=crop',
         'https://images.unsplash.com/photo-1582260600171-89771ba0df8b?q=80&w=800&auto=format&fit=crop',
         'https://images.unsplash.com/photo-1628155930542-3c7a64e2c833?q=80&w=800&auto=format&fit=crop',
         'https://images.unsplash.com/photo-1506744038136-46273834b3fb?q=80&w=800&auto=format&fit=crop',
-        'https://images.unsplash.com/photo-1544919982-b61976f0ba43?q=80&w=800&auto=format&fit=crop', // Maricel style
-        'https://images.unsplash.com/photo-1516483642774-3a32836c69bf?q=80&w=800&auto=format&fit=crop'
+        'https://images.unsplash.com/photo-1544919982-b61976f0ba43?q=80&w=800&auto=format&fit=crop',
+        'https://images.unsplash.com/photo-1516483642774-3a32836c69bf?q=80&w=800&auto=format&fit=crop',
+        'https://upload.wikimedia.org/wikipedia/commons/thumb/c/ca/Sitges_-_Esgl%C3%A9sia_de_Sant_Bartomeu_i_Santa_Tecla.jpg/800px-Sitges_-_Esgl%C3%A9sia_de_Sant_Bartomeu_i_Santa_Tecla.jpg',
+        'https://upload.wikimedia.org/wikipedia/commons/thumb/c/ca/Sitges_01.jpg/800px-Sitges_01.jpg',
+        'https://upload.wikimedia.org/wikipedia/commons/thumb/d/d6/Sitges_carrer_de_les_Parellades.jpg/800px-Sitges_carrer_de_les_Parellades.jpg'
     ];
 
     let isFetchingNews = false;
