@@ -21,13 +21,35 @@ module.exports = async (req, res) => {
 
     try {
         // 1. Fetch Google News RSS
-        const response = await axios.get(GOOGLE_NEWS_RSS);
+        const response = await axios.get(GOOGLE_NEWS_RSS, { timeout: 5000 });
         const parser = new XMLParser();
         const jsonObj = parser.parse(response.data);
-        const items = jsonObj.rss.channel.item.slice(0, 10); // Agafem les 10 primeres
 
-        // 2. Traduir títols amb Groq (en paral·lel per velocitat)
+        // Validació d'estructura del RSS
+        const rawItems = jsonObj.rss?.channel?.item;
+        if (!rawItems) {
+            return res.status(200).json([]); // No hi ha notícies
+        }
+
+        const items = Array.isArray(rawItems) ? rawItems.slice(0, 10) : [rawItems];
+
+        // 2. Si no hi ha clau, retornem les originals directament
+        if (!GROQ_API_KEY) {
+            const basicItems = items.map(item => ({
+                id: item.guid?.['#text'] || item.guid || Math.random(),
+                originalTitle: item.title,
+                title: item.title, // Sense traducció
+                link: item.link,
+                pubDate: item.pubDate,
+                source: item.source?.['#text'] || item.source || 'Font desconeguda',
+                image: `https://images.unsplash.com/photo-1548432328-94436579979d?w=800&q=80` // Imatge de Sitges més estable
+            }));
+            return res.status(200).json(basicItems);
+        }
+
+        // 3. Traduir títols amb Groq (en paral·lel per velocitat)
         const translatedItems = await Promise.all(items.map(async (item) => {
+            const originalTitle = item.title || 'Sense títol';
             try {
                 const groqRes = await axios.post('https://api.groq.com/openai/v1/chat/completions', {
                     model: "llama-3.3-70b-versatile",
@@ -36,50 +58,48 @@ module.exports = async (req, res) => {
                             role: "system",
                             content: "Ets un traductor expert al català. Tradueix el següent títol de notícia al català de forma natural i periodística. Només retorna el títol traduït."
                         },
-                        {
-                            role: "user",
-                            content: item.title
-                        }
+                        { role: "user", content: originalTitle }
                     ],
                     temperature: 0.3
                 }, {
                     headers: {
                         'Authorization': `Bearer ${GROQ_API_KEY}`,
                         'Content-Type': 'application/json'
-                    }
+                    },
+                    timeout: 4000 // Evitem llargues esperes
                 });
 
                 const translatedTitle = groqRes.data.choices[0].message.content.trim();
 
-                // Intentem buscar una imatge genèrica o extreure-la si fos possible (simplificat aquí)
-                // Pel RSS de Google News, les imatges sovint no venen directament.
-                const imagePlaceholder = `https://source.unsplash.com/featured/?sitges,landscape,${Math.random()}`;
-
                 return {
-                    id: item.guid['#text'] || item.guid,
-                    originalTitle: item.title,
+                    id: item.guid?.['#text'] || item.guid || Math.random(),
+                    originalTitle: originalTitle,
                     title: translatedTitle,
                     link: item.link,
                     pubDate: item.pubDate,
-                    source: item.source['#text'] || item.source,
-                    image: imagePlaceholder // Placeholder modern mentre no tinguem crawling real
+                    source: item.source?.['#text'] || item.source || 'Font desconeguda',
+                    image: `https://images.unsplash.com/photo-1548432328-94436579979d?w=800&q=80`
                 };
             } catch (error) {
-                console.error('Error traduint notícia:', error);
+                console.error('Error traduint notícia individual:', error.message);
                 return {
-                    id: item.guid['#text'] || item.guid,
-                    originalTitle: item.title,
-                    title: item.title, // Fallback a original
+                    id: item.guid?.['#text'] || item.guid || Math.random(),
+                    originalTitle: originalTitle,
+                    title: originalTitle, // Fallback
                     link: item.link,
                     pubDate: item.pubDate,
-                    source: item.source['#text'] || item.source
+                    source: item.source?.['#text'] || item.source || 'Font desconeguda',
+                    image: `https://images.unsplash.com/photo-1548432328-94436579979d?w=800&q=80`
                 };
             }
         }));
 
         res.status(200).json(translatedItems);
     } catch (error) {
-        console.error('Error general:', error);
-        res.status(500).json({ error: 'Error recollint notícies' });
+        console.error('Error general API:', error.message);
+        res.status(500).json({
+            error: 'Error recollint notícies',
+            details: error.message
+        });
     }
 };

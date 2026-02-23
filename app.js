@@ -21,7 +21,10 @@ const fetchNews = async () => {
 
     try {
         const response = await fetch('/api/news');
-        if (!response.ok) throw new Error('Error API');
+        if (!response.ok) {
+            const errorText = await response.text();
+            throw new Error(`API Error: ${response.status} - ${errorText}`);
+        }
         const news = await response.json();
 
         localStorage.setItem(CACHE_KEY, JSON.stringify({
@@ -32,7 +35,13 @@ const fetchNews = async () => {
         renderNews(news);
     } catch (error) {
         console.error('Error fetching news:', error);
-        feedContainer.innerHTML = '<p style="text-align:center; padding:2rem;">No s\'han pogut carregar les notícies reals. Revisa la configuració a Vercel.</p>';
+        feedContainer.innerHTML = `
+            <div style="text-align:center; padding:2rem;">
+                <p>No s'han pogut carregar les notícies reals.</p>
+                <p style="font-size: 0.8rem; color: #cc0000; margin-top: 1rem;">Detalls: ${error.message}</p>
+                <button onclick="localStorage.removeItem('${CACHE_KEY}'); location.reload();" style="margin-top: 1rem; border: none; background: var(--burgundy); color: white; padding: 0.5rem 1rem; border-radius: 4px; cursor: pointer;">Tornar a provar</button>
+            </div>
+        `;
     } finally {
         loadingTrigger.style.display = 'none';
     }
