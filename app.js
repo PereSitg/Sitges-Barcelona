@@ -208,7 +208,9 @@ window.onload = () => {
     const obs = new IntersectionObserver((es) => { if (es[0].isIntersecting) fetchNews(); }, { threshold: 0.1 });
     obs.observe(sentinel);
 
-    fetchNews(true);
+    if (currentSection !== 'restaurants') {
+        fetchNews(true);
+    }
     fetchX();
     setInterval(() => { fetchNews(true); fetchX(); }, 4 * 60 * 60 * 1000);
 };
