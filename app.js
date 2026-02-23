@@ -7,12 +7,9 @@ window.onload = () => {
     const modalTitleEs = document.getElementById('modal-title-es');
     const modalDescEs = document.getElementById('modal-desc-es');
     const modalLink = document.getElementById('modal-link');
-    const pageTitle = document.getElementById('page-title');
 
-    const brandLink = document.getElementById('brand-link');
-    const linkGeneral = document.getElementById('link-general');
-    const linkFestival = document.getElementById('link-festival');
-    const linkRestaurants = document.getElementById('id-restaurants');
+    // Detect active section from body attribute
+    const currentSection = document.body.getAttribute('data-section') || 'general';
 
     // Feeds Config
     const FEEDS_CONFIG = {
@@ -28,12 +25,6 @@ window.onload = () => {
         restaurants: ['https://news.google.com/rss/search?q=donde+comer+en+sitges&hl=es&gl=ES&ceid=ES%3Aes']
     };
 
-    const SECTION_LABELS = {
-        general: 'Pàgina Inici',
-        festival: 'Sitges Film Festival',
-        restaurants: 'Donde comer en Sitges'
-    };
-
     const NITTER_INSTANCES = [
         'https://nitter.poast.org',
         'https://nitter.cz',
@@ -42,17 +33,16 @@ window.onload = () => {
         'https://nitter.moomoo.me'
     ];
 
-    // Safe Images List (Curated)
+    // Biblioteca de SITGES real (Direct Unsplash per evitar hotlinking issues)
     const SAFE_SITGES_IMAGES = [
-        'https://images.weserv.nl/?url=www.visitsitges.com/wp-content/uploads/2020/09/esglesia-sitges-barcelona.jpg&w=800&fit=cover',
-        'https://images.weserv.nl/?url=www.visitsitges.com/wp-content/uploads/2021/04/platja-sant-sebastia-sitges.jpg&w=800&fit=crop',
-        'https://images.weserv.nl/?url=www.sitgesanytime.com/media/site/carrer-den-bosch.jpg&w=800&fit=crop',
-        'https://images.weserv.nl/?url=www.sitgesanytime.com/media/site/baluard-vidal-i-quadras.jpg&w=800&fit=crop',
-        'https://images.weserv.nl/?url=www.sitgesanytime.com/media/site/rac-de-la-calma.jpg&w=800&fit=crop',
-        'https://images.weserv.nl/?url=www.visitsitges.com/wp-content/uploads/2022/01/port-aiguadolç-sitges.jpg&w=800&fit=crop'
+        'https://images.unsplash.com/photo-1548175114-61c0bd664653?q=80&w=800&auto=format&fit=crop',
+        'https://images.unsplash.com/photo-1582260600171-89771ba0df8b?q=80&w=800&auto=format&fit=crop',
+        'https://images.unsplash.com/photo-1628155930542-3c7a64e2c833?q=80&w=800&auto=format&fit=crop',
+        'https://images.unsplash.com/photo-1506744038136-46273834b3fb?q=80&w=800&auto=format&fit=crop',
+        'https://images.unsplash.com/photo-1544919982-b61976f0ba43?q=80&w=800&auto=format&fit=crop', // Maricel style
+        'https://images.unsplash.com/photo-1516483642774-3a32836c69bf?q=80&w=800&auto=format&fit=crop'
     ];
 
-    let currentSection = 'general';
     let isFetchingNews = false;
     let allNewsItems = [];
     let itemsShown = 0;
@@ -169,7 +159,7 @@ window.onload = () => {
     async function fetchX(instanceIdx = 0) {
         if (!twitterFeed) return;
         if (instanceIdx >= NITTER_INSTANCES.length) {
-            twitterFeed.innerHTML = '<div style="padding:1rem; color:#888; text-align:center;">Xarxes no disponibles temporalment.</div>';
+            twitterFeed.innerHTML = '<div style="padding:1.2rem; color:#888; text-align:center;">Xarxes no disponibles temporalment en cap servidor.</div>';
             return;
         }
 
@@ -179,6 +169,7 @@ window.onload = () => {
 
         try {
             const res = await fetch(apiUrl);
+            if (!res.ok) throw new Error('Proxy error');
             const data = await res.json();
             if (data.status === 'ok' && data.items && data.items.length > 0) {
                 renderX(data.items);
@@ -211,36 +202,14 @@ window.onload = () => {
         });
     }
 
-    function switchSection(section) {
-        currentSection = section;
-
-        // Update Nav
-        linkGeneral.classList.toggle('active', section === 'general');
-        linkFestival.classList.toggle('active', section === 'festival');
-        if (linkRestaurants) linkRestaurants.classList.toggle('active', section === 'restaurants');
-
-        // Update Page Label
-        if (pageTitle) {
-            pageTitle.innerText = SECTION_LABELS[section] || 'La Veu de Sitges';
-            pageTitle.style.display = 'block';
-        }
-
-        window.scrollTo(0, 0);
-        fetchNews(true);
-    }
-
-    brandLink.onclick = () => switchSection('general');
-    linkGeneral.onclick = (e) => { e.preventDefault(); switchSection('general'); };
-    linkFestival.onclick = (e) => { e.preventDefault(); switchSection('festival'); };
-    if (linkRestaurants) linkRestaurants.onclick = (e) => { e.preventDefault(); switchSection('restaurants'); };
     modalClose.onclick = () => iaModal.style.display = 'none';
     window.onclick = (e) => { if (e.target == iaModal) iaModal.style.display = 'none'; };
 
     const obs = new IntersectionObserver((es) => { if (es[0].isIntersecting) fetchNews(); }, { threshold: 0.1 });
     obs.observe(sentinel);
 
-    // Initial load
-    switchSection('general');
+    // Run
+    fetchNews(true);
     fetchX();
     setInterval(() => { fetchNews(true); fetchX(); }, 4 * 60 * 60 * 1000);
 };
