@@ -69,8 +69,10 @@ nav a.active {
 }
 
 .content-grid {
-    display: grid;
-    grid-template-columns: 1fr 30%;
+    display: flex;
+    flex-direction: column;
+    max-width: 800px;
+    margin: 0 auto;
     gap: 2.5rem;
 }
 
@@ -179,6 +181,38 @@ nav a.active {
     padding: 0 1rem;
     border-radius: 6px;
     cursor: pointer;
+}
+
+.share-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.8rem;
+    margin-top: 1.5rem;
+    padding-top: 1rem;
+    border-top: 1px solid #eee;
+}
+
+.btn-share {
+    background: #fff;
+    border: 1px solid #eee;
+    color: #888;
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 8px;
+    cursor: pointer;
+    text-decoration: none;
+    transition: all 0.2s ease;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.02);
+}
+
+.btn-share:hover {
+    background: var(--gray-bg);
+    color: var(--burgundy);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 10px rgba(0,0,0,0.05);
 }
 
 /* Modal */

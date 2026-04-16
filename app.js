@@ -137,8 +137,25 @@ window.onload = () => {
                         <a href="${item.link}" target="_blank" class="btn-read">Llegir notícia &rarr;</a>
                         <button class="btn-ia">IA 🤖</button>
                     </div>
+                    <div class="share-actions">
+                        <button class="btn-share btn-copy" data-link="${item.link}" title="Copiar enllaç">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="width: 18px; height: 18px;"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg>
+                        </button>
+                        <a href="mailto:?subject=${encodeURIComponent(titleObj.text)}&body=${encodeURIComponent(item.link)}" class="btn-share" title="Enviar per correu">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="width: 18px; height: 18px;"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>
+                        </a>
+                    </div>
                 </div>
             `;
+
+            card.querySelector('.btn-copy').onclick = (e) => {
+                const link = e.currentTarget.getAttribute('data-link');
+                navigator.clipboard.writeText(link).then(() => {
+                    const originalContent = e.currentTarget.innerHTML;
+                    e.currentTarget.innerHTML = '<span style="font-size: 0.7rem; font-weight: bold;">Copiat!</span>';
+                    setTimeout(() => { e.currentTarget.innerHTML = originalContent; }, 2000);
+                });
+            };
 
             card.querySelector('.btn-ia').onclick = () => {
                 modalTitleEs.textContent = item.title;
